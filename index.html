@@ -692,6 +692,90 @@
   .mt-24 { margin-top: 24px; }
   .gap-top { margin-top: 24px; }
   .row-between { display: flex; justify-content: space-between; align-items: center; }
+
+  /* ── Mobile responsive ─────────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    /* Header */
+    .site-header-inner {
+      padding: 10px 16px;
+      gap: 8px;
+    }
+    .header-divider { display: none; }
+    .header-product { display: none; }
+    .header-logo img { height: 22px; }
+
+    /* Page */
+    .page { padding: 24px 16px 60px; }
+
+    /* Hero */
+    .hero {
+      flex-direction: row;
+      align-items: flex-end;
+      min-height: auto;
+      margin-bottom: 24px;
+      gap: 12px;
+    }
+    .hero-left { padding-top: 8px; padding-bottom: 16px; }
+    .hero h1 { font-size: 24px; }
+    .hero p { font-size: 13px; margin-top: 8px; }
+    .hero-art {
+      width: 110px;
+      margin-bottom: -24px;
+      flex-shrink: 0;
+    }
+    .hero-art img { width: 110px; }
+
+    /* Tab nav row */
+    .tab-nav-row {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab-btn { font-size: 13px; padding: 8px 16px; }
+
+    /* Two-col → single col */
+    .two-col,
+    #tab-pricing .two-col {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Cards */
+    .card, .card-tinted, .gradient-banner { padding: 16px; }
+
+    /* Pricing output */
+    .price-main { font-size: 34px; }
+    .tier-badge { font-size: 11px; padding: 5px 10px; }
+
+    /* Tier table — hide the empty last column */
+    .tier-table th:last-child,
+    .tier-table td:last-child { display: none; }
+
+    /* ROI inputs inline → single col */
+    .input-row-inline { grid-template-columns: 1fr; }
+
+    /* ROI metrics */
+    .roi-metrics { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .metric-value { font-size: 18px; }
+    .metric-value.large { font-size: 22px; }
+
+    /* Breakeven */
+    .breakeven-box { flex-direction: column; text-align: center; gap: 8px; padding: 16px; }
+    .breakeven-pct { font-size: 30px; }
+
+    /* Footer */
+    .footer { flex-direction: column; gap: 16px; padding: 20px; }
+    .footer-links { text-align: left; }
+
+    /* CTA button */
+    .cta-btn { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 420px) {
+    .hero { flex-direction: column; align-items: flex-start; }
+    .hero-art { align-self: flex-end; margin-bottom: 0; width: 90px; }
+    .hero-art img { width: 90px; }
+    .roi-metrics { grid-template-columns: 1fr; }
+    .tab-btn { padding: 8px 12px; font-size: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -736,7 +820,7 @@
   </div>
 
   <!-- Tab nav -->
-  <div style="display:flex; align-items:center; gap:12px; margin-bottom:32px; flex-wrap:wrap;">
+  <div class="tab-nav-row" style="display:flex; align-items:center; gap:12px; margin-bottom:32px; flex-wrap:wrap;">
     <div class="tab-nav" style="margin-bottom:0;">
       <button class="tab-btn active" onclick="switchTab('pricing', this)">💰 Pricing</button>
       <button class="tab-btn" onclick="switchTab('roi', this)">📈 ROI Calculator</button>
