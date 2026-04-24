@@ -639,6 +639,25 @@
   .icon-box-lg  { width: 60px; height: 60px; }
   .icon-box-sm  { width: 36px; height: 36px; border-radius: 8px; }
 
+  /* ── Copy Link button ─────────────────────────────────────────────── */
+  .copy-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--blue-dark);
+    background: var(--tag-bg);
+    border: none;
+    border-radius: var(--radius-badge);
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0.2px;
+  }
+  .copy-link-btn:hover { background: #c4d4ff; }
+
   /* ── Utility ───────────────────────────────────────────────────────── */
   .mt-16 { margin-top: 16px; }
   .mt-24 { margin-top: 24px; }
@@ -661,7 +680,10 @@
       </div>
       <div class="header-product">Mobile Protect <span>for Gaming</span></div>
     </div>
-    <span class="badge">Interactive Calculator</span>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span class="badge">Interactive Calculator</span>
+      <button class="copy-link-btn" onclick="copyLink(this)">🔗 Share</button>
+    </div>
   </div>
 </header>
 
@@ -884,27 +906,27 @@
             <div class="assumption-slider">
               <label>
                 IAP Fraud / Bypass Rate
-                <span class="slider-val" id="v-iap-fraud">1%</span>
+                <span class="slider-val" id="v-iap-fraud">2%</span>
               </label>
-              <input type="range" id="s-iap-fraud" min="0" max="15" step="0.5" value="1"
+              <input type="range" id="s-iap-fraud" min="0" max="15" step="0.5" value="2"
                      oninput="updateSlider('iap-fraud',this.value,'%',0.01);calcROI()">
               <div class="bench">Industry: 2–5%  ·  AppsFlyer Mobile Gaming Report 2023</div>
             </div>
             <div class="assumption-slider">
               <label>
                 Bot / Fake Install Rate
-                <span class="slider-val" id="v-bot-rate">5%</span>
+                <span class="slider-val" id="v-bot-rate">10%</span>
               </label>
-              <input type="range" id="s-bot-rate" min="0" max="40" step="1" value="5"
+              <input type="range" id="s-bot-rate" min="0" max="40" step="1" value="10"
                      oninput="updateSlider('bot-rate',this.value,'%',0.01);calcROI()">
               <div class="bench">Industry: 10–25%  ·  AppsFlyer Ad Fraud Report 2023</div>
             </div>
             <div class="assumption-slider">
               <label>
                 Ad Traffic Fraud Rate
-                <span class="slider-val" id="v-ad-fraud">8%</span>
+                <span class="slider-val" id="v-ad-fraud">18%</span>
               </label>
-              <input type="range" id="s-ad-fraud" min="0" max="50" step="1" value="8"
+              <input type="range" id="s-ad-fraud" min="0" max="50" step="1" value="18"
                      oninput="updateSlider('ad-fraud',this.value,'%',0.01);calcROI()">
               <div class="bench">Industry: 18–28%  ·  DoubleVerify Global Report 2023</div>
             </div>
@@ -1268,8 +1290,57 @@ function switchTab(name, btn) {
   if (name === 'roi') calcROI();
 }
 
+// ── URL params — read on load, write on copy ──────────────────────────────
+function getParam(key, fallback) {
+  const val = new URLSearchParams(window.location.search).get(key);
+  return val !== null ? val : fallback;
+}
+
+function buildShareURL() {
+  const iap      = document.getElementById('roi-iap').value;
+  const ad       = document.getElementById('roi-ad').value;
+  const installs = document.getElementById('roi-installs').value;
+  const paying   = document.getElementById('roi-paying').value;
+  const uac      = document.getElementById('roi-uac').value;
+  const ltv      = document.getElementById('roi-ltv').value;
+  const params = new URLSearchParams({ mau, apps, iap, ad, installs, paying, uac, ltv });
+  return window.location.origin + window.location.pathname + '?' + params.toString();
+}
+
+function copyLink(btnEl) {
+  const url = buildShareURL();
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btnEl.textContent;
+    btnEl.textContent = '✓ Copied!';
+    btnEl.style.background = '#12b981';
+    setTimeout(() => {
+      btnEl.textContent = orig;
+      btnEl.style.background = '';
+    }, 2000);
+  });
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
-updatePricing();
+(function initFromURL() {
+  // Pricing inputs
+  mau  = parseInt(getParam('mau',  mau));
+  apps = parseInt(getParam('apps', apps));
+  document.getElementById('mau').value       = mau;
+  document.getElementById('mau-slider').value = Math.min(mau, 30000000);
+  document.getElementById('apps-display').textContent = apps;
+
+  // ROI revenue inputs
+  const fields = ['roi-iap','roi-ad','roi-installs','roi-paying','roi-uac','roi-ltv'];
+  const keys   = ['iap','ad','installs','paying','uac','ltv'];
+  fields.forEach((id, i) => {
+    const el = document.getElementById(id);
+    const v  = getParam(keys[i], null);
+    if (v !== null) el.value = v;
+  });
+
+  updateQuickBtns();
+  updatePricing();
+})();
 </script>
 </body>
 </html>
