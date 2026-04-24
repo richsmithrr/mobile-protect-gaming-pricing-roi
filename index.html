@@ -680,10 +680,7 @@
       </div>
       <div class="header-product">Mobile Protect <span>for Gaming</span></div>
     </div>
-    <div style="display:flex; align-items:center; gap:12px;">
-      <span class="badge">Interactive Calculator</span>
-      <button class="copy-link-btn" onclick="copyLink(this)">🔗 Share</button>
-    </div>
+    <span class="badge">Interactive Calculator</span>
   </div>
 </header>
 
@@ -710,9 +707,12 @@
   </div>
 
   <!-- Tab nav -->
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('pricing', this)">💰 Pricing</button>
-    <button class="tab-btn" onclick="switchTab('roi', this)">📈 ROI Calculator</button>
+  <div style="display:flex; align-items:center; gap:16px; margin-bottom:32px;">
+    <div class="tab-nav" style="margin-bottom:0;">
+      <button class="tab-btn active" onclick="switchTab('pricing', this)">💰 Pricing</button>
+      <button class="tab-btn" onclick="switchTab('roi', this)">📈 ROI Calculator</button>
+    </div>
+    <button class="copy-link-btn" onclick="copyLink(this)">🔗 Share</button>
   </div>
 
   <!-- ════════════════════════════════════════════════════════════════════ -->
