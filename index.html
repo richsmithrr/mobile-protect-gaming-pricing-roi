@@ -639,6 +639,35 @@
   .icon-box-lg  { width: 60px; height: 60px; }
   .icon-box-sm  { width: 36px; height: 36px; border-radius: 8px; }
 
+  /* ── Currency toggle ──────────────────────────────────────────────── */
+  .currency-toggle {
+    display: flex;
+    gap: 2px;
+    background: var(--section-bg);
+    border-radius: var(--radius-badge);
+    padding: 3px;
+  }
+  .curr-btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    width: 32px;
+    height: 28px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: rgba(0,26,65,0.45);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .curr-btn.active {
+    background: var(--white);
+    color: var(--blue-dark);
+    box-shadow: 0 1px 4px rgba(0,26,65,0.10);
+  }
+  .curr-btn:hover:not(.active) { color: var(--navy); }
+
   /* ── Copy Link button ─────────────────────────────────────────────── */
   .copy-link-btn {
     display: inline-flex;
@@ -707,10 +736,15 @@
   </div>
 
   <!-- Tab nav -->
-  <div style="display:flex; align-items:center; gap:16px; margin-bottom:32px;">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:32px; flex-wrap:wrap;">
     <div class="tab-nav" style="margin-bottom:0;">
       <button class="tab-btn active" onclick="switchTab('pricing', this)">💰 Pricing</button>
       <button class="tab-btn" onclick="switchTab('roi', this)">📈 ROI Calculator</button>
+    </div>
+    <div class="currency-toggle">
+      <button class="curr-btn active" onclick="setCurrency('$', this)">$</button>
+      <button class="curr-btn" onclick="setCurrency('£', this)">£</button>
+      <button class="curr-btn" onclick="setCurrency('€', this)">€</button>
     </div>
     <button class="copy-link-btn" onclick="copyLink(this)">🔗 Share</button>
   </div>
@@ -770,17 +804,17 @@
             </thead>
             <tbody>
               <tr id="t-entry"><td><span class="tier-name">Entry</span></td><td>0 – 15K</td><td>No cost</td><td></td></tr>
-              <tr id="t-1"><td><span class="tier-name">Tier 1</span></td><td>15K – 100K</td><td>$0.00200</td><td></td></tr>
-              <tr id="t-2"><td><span class="tier-name">Tier 2</span></td><td>100K – 1M</td><td>$0.00175</td><td></td></tr>
-              <tr id="t-3"><td><span class="tier-name">Tier 3</span></td><td>1M – 3M</td><td>$0.00150</td><td></td></tr>
-              <tr id="t-4"><td><span class="tier-name">Tier 4</span></td><td>3M – 10M</td><td>$0.00110</td><td></td></tr>
-              <tr id="t-5"><td><span class="tier-name">Tier 5</span></td><td>10M – 30M</td><td>$0.00080</td><td></td></tr>
-              <tr id="t-6"><td><span class="tier-name">Tier 6</span></td><td>30M+</td><td>$0.00050</td><td></td></tr>
+              <tr id="t-1"><td><span class="tier-name">Tier 1</span></td><td>15K – 100K</td><td><span class="currency-sym">$</span>0.00200</td><td></td></tr>
+              <tr id="t-2"><td><span class="tier-name">Tier 2</span></td><td>100K – 1M</td><td><span class="currency-sym">$</span>0.00175</td><td></td></tr>
+              <tr id="t-3"><td><span class="tier-name">Tier 3</span></td><td>1M – 3M</td><td><span class="currency-sym">$</span>0.00150</td><td></td></tr>
+              <tr id="t-4"><td><span class="tier-name">Tier 4</span></td><td>3M – 10M</td><td><span class="currency-sym">$</span>0.00110</td><td></td></tr>
+              <tr id="t-5"><td><span class="tier-name">Tier 5</span></td><td>10M – 30M</td><td><span class="currency-sym">$</span>0.00080</td><td></td></tr>
+              <tr id="t-6"><td><span class="tier-name">Tier 6</span></td><td>30M+</td><td><span class="currency-sym">$</span>0.00050</td><td></td></tr>
             </tbody>
           </table>
           <div style="margin-top:12px; font-size:11px; color:rgba(0,26,65,0.45); line-height:1.5;">
             Stepped (tax-bracket) pricing — each MAU charged once at its tier rate only.<br>
-            $350 / app / month base fee applies to all tiers.
+            <span class="currency-sym">$</span>350 / app / month base fee applies to all tiers.
           </div>
         </div>
       </div>
@@ -802,7 +836,7 @@
             <span class="val" id="price-mau-cost">$82</span>
           </div>
           <div class="price-row">
-            <span>App Base Fee (<span id="apps-in-price">2</span> apps × $350)</span>
+            <span>App Base Fee (<span id="apps-in-price">2</span> apps × <span class="currency-sym">$</span>350)</span>
             <span class="val" id="price-base">$700</span>
           </div>
           <div class="price-divider"></div>
@@ -1106,6 +1140,7 @@
 // ── State ────────────────────────────────────────────────────────────────
 let mau   = 50000;
 let apps  = 2;
+let currencySymbol = '$';
 
 // ── Pricing logic ────────────────────────────────────────────────────────
 function calcMAUCost(m) {
@@ -1129,10 +1164,10 @@ function getTierInfo(m) {
 }
 
 function fmtUSD(n, decimals=0) {
-  if (n === 0) return '$0';
+  if (n === 0) return currencySymbol + '0';
   const abs = Math.abs(n);
   const str = abs.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
-  return (n < 0 ? '($' : '$') + str + (n < 0 ? ')' : '');
+  return (n < 0 ? '(' + currencySymbol : currencySymbol) + str + (n < 0 ? ')' : '');
 }
 function fmtPct(n) { return (n * 100).toFixed(1) + '%'; }
 
@@ -1148,7 +1183,7 @@ function updatePricing() {
   document.getElementById('price-mau-cost').textContent = fmtUSD(mauCost);
   document.getElementById('price-base').textContent     = fmtUSD(baseCost);
   document.getElementById('price-annual').textContent   = fmtUSD(annual);
-  document.getElementById('price-effective').textContent= '$' + effRate.toFixed(5);
+  document.getElementById('price-effective').textContent= currencySymbol + effRate.toFixed(5);
   document.getElementById('apps-in-price').textContent  = apps;
   document.getElementById('active-tier-label').textContent = 'Active Tier: ' + tier.label;
 
@@ -1272,6 +1307,16 @@ function updateSlider(id, val, unit, multiplier) {
   document.getElementById('v-' + id).textContent = displayVal;
 }
 
+// ── Currency toggle ───────────────────────────────────────────────────────
+function setCurrency(symbol, btn) {
+  currencySymbol = symbol;
+  document.querySelectorAll('.curr-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.currency-sym').forEach(el => el.textContent = symbol);
+  updatePricing();
+  calcROI();
+}
+
 // ── Assumptions toggle ────────────────────────────────────────────────────
 function toggleAssumptions(btn) {
   const body  = document.getElementById('assumptions-body');
@@ -1303,7 +1348,8 @@ function buildShareURL() {
   const paying   = document.getElementById('roi-paying').value;
   const uac      = document.getElementById('roi-uac').value;
   const ltv      = document.getElementById('roi-ltv').value;
-  const params = new URLSearchParams({ mau, apps, iap, ad, installs, paying, uac, ltv });
+  const currency = currencySymbol;
+  const params = new URLSearchParams({ mau, apps, iap, ad, installs, paying, uac, ltv, currency });
   return window.location.origin + window.location.pathname + '?' + params.toString();
 }
 
@@ -1337,6 +1383,17 @@ function copyLink(btnEl) {
     const v  = getParam(keys[i], null);
     if (v !== null) el.value = v;
   });
+
+  // Currency
+  const savedCurrency = getParam('currency', null);
+  if (savedCurrency && ['$', '£', '€'].includes(savedCurrency)) {
+    currencySymbol = savedCurrency;
+    document.querySelectorAll('.curr-btn').forEach(btn => {
+      const match = btn.textContent.trim() === savedCurrency;
+      btn.classList.toggle('active', match);
+    });
+    document.querySelectorAll('.currency-sym').forEach(el => el.textContent = savedCurrency);
+  }
 
   updateQuickBtns();
   updatePricing();
